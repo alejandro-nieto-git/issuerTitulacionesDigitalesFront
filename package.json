@@ -11,12 +11,16 @@
   },
   "devDependencies": {
     "nuxt": "^3.9.3",
+    "nuxt-icon": "^0.6.8",
     "vue": "^3.4.14",
     "vue-router": "^4.2.5"
   },
   "dependencies": {
     "@iconify-json/fa6-regular": "^1.1.18",
+    "@iconify-json/pajamas": "^1.1.42",
+    "@iconify-json/ph": "^1.1.11",
     "@nuxt/ui": "^2.12.3",
+    "axios": "^1.6.7",
     "bootstrap": "^5.3.2",
     "jquery": "^3.7.1",
     "popper.js": "^1.16.1"
