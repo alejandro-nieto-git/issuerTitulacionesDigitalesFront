@@ -3,8 +3,7 @@
 </script>
 
 <template>
-
-    <div class="bg-blue-940">
+        <div class="flex flex-row justify-center items-center">
         <div class="flex flex-col justify-center items-center text-lg light:text-black text-xl">
             <img src="/escudouva.png" alt="Logo Universidad de Valladolid" class="w-96 h-94 mb-20 mt-20">
 
@@ -21,8 +20,5 @@
 
             <img src="/QRLoginEUDIWallet.png" alt="QR Login EUDI Wallet" class="w-36 h-34 mb-24 mt-10">
         </div>
-    </div>
+        </div>
 </template>
-
-<script>
-</script>

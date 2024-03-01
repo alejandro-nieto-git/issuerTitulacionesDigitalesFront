@@ -26,9 +26,4 @@
   <div>
     <NuxtPage />
   </div>
-
-  <footer class="text-xs text-center">
-    <UDivider label="" />
-    <p class="inline">Alejandro Nieto Gallego 2024 </p>
-  </footer>
 </template>
