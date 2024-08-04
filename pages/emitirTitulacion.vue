@@ -1,8 +1,49 @@
 <script setup lang="ts">
+  import { ref, onMounted } from 'vue';
+  import QRCode from 'qrcode';
+  import axios from 'axios';
+
   const titulacionAEmitir = JSON.parse(localStorage.getItem('titulacionAEmitir')!)
 
-  //TODO: Generar el QR para emitir la titulacion
-  //TODO: Enlazar el boton para emitir la titulacion
+  let qrCodeUrl = '';
+  let uri = '';
+  let pin = '';
+
+  // Function to make the POST request and generate the QR code
+  const generateQRCode = async () => {
+    try {
+      const response = await axios.post('http://localhost:9000/credentialOfferTitulacionDigital', {
+        preAuthorizedCode: '1234',
+        idTitulacionAEmitir: '83639'
+      });
+
+      uri = response.data.uri;
+      pin = response.data.pin;
+      qrCodeUrl = await QRCode.toDataURL(uri);
+    } catch (error) {
+      console.error('Error generating QR code:', error);
+    }
+  };
+
+  const emitirTitulacion = async () => {
+    try {
+      await axios.post('https://localhost:8082/initiateIssuance', {
+        oidcURI: uri
+      });
+
+      await axios.post('https://localhost:8082/tokenRequest', {
+        pin: pin
+      });
+
+      await axios.post('https://localhost:8082/credentialRequest');
+
+      console.log('Titulacion emitted successfully');
+    } catch (error) {
+      console.error('Error emitting titulacion:', error);
+    }
+  };
+
+  onMounted(generateQRCode);
 </script>
 
 <template>
@@ -13,6 +54,6 @@
 
             o escanea con tu wallet
 
-            <img src="/QRLoginEUDIWallet.png" alt="QR Login EUDI Wallet" class="w-36 h-34 mb-24 mt-16">
+            <img :src="qrCodeUrl" alt="QR Login EUDI Wallet" class="w-36 h-34 mb-24 mt-16">
         </div>
 </template>
