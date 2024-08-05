@@ -5,9 +5,10 @@
 
   const titulacionAEmitir = JSON.parse(localStorage.getItem('titulacionAEmitir')!)
 
-  let qrCodeUrl = '';
+  let qrCodeUrl = ref<string>('');
   let uri = '';
   let pin = '';
+  const isDataReady = ref<boolean>(false);
 
   // Function to make the POST request and generate the QR code
   const generateQRCode = async () => {
@@ -19,7 +20,8 @@
 
       uri = response.data.uri;
       pin = response.data.pin;
-      qrCodeUrl = await QRCode.toDataURL(uri);
+      qrCodeUrl.value = await QRCode.toDataURL(uri);
+      isDataReady.value = true;
     } catch (error) {
       console.error('Error generating QR code:', error);
     }
@@ -47,13 +49,19 @@
 </script>
 
 <template>
-        <div class="flex flex-col justify-center items-center text-lg light:text-black text-xl">
-            <p class="text-4xl mt-10">Se va a emitir tu titulacion "{{ titulacionAEmitir.tipo }} en {{ titulacionAEmitir.nombreTitulacion }}"</p>
+  <!-- Only render if titulacionAEmitir is defined -->
+  <div v-if="titulacionAEmitir" class="flex flex-col justify-center items-center text-lg light:text-black text-xl">
+    <p class="text-4xl mt-10">Se va a emitir tu titulacion "{{ titulacionAEmitir.tipo }} en {{ titulacionAEmitir.nombreTitulacion }}"</p>
 
-            <UButton class="mb-16 mt-28" icon="i-fa6-regular-address-card" size="xl" @click="emitirTitulacion()">Emitir </UButton>
+    <UButton class="mb-16 mt-28" icon="i-fa6-regular-address-card" size="xl" :disabled="!isDataReady" @click="emitirTitulacion()">Emitir</UButton>
 
-            o escanea con tu wallet
+    o escanea con tu wallet
 
-            <img :src="qrCodeUrl" alt="QR Login EUDI Wallet" class="w-36 h-34 mb-24 mt-16">
-        </div>
+    <img :src="qrCodeUrl" alt="QR Login EUDI Wallet" class="w-36 h-34 mb-24 mt-16">
+  </div>
+
+  <!-- Fallback content if titulacionAEmitir is not found -->
+  <div v-else class="flex justify-center items-center text-lg light:text-black text-xl">
+    <p class="text-4xl mt-10">No se encontró la titulación para emitir. Por favor, regresa y selecciona una titulación.</p>
+  </div>
 </template>
