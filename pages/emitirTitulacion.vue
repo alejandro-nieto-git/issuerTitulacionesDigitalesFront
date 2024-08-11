@@ -2,6 +2,9 @@
   import { ref, onMounted } from 'vue';
   import QRCode from 'qrcode';
   import axios from 'axios';
+  import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
   const titulacionAEmitir = JSON.parse(localStorage.getItem('titulacionAEmitir')!)
 
@@ -29,17 +32,24 @@
 
   const emitirTitulacion = async () => {
     try {
-      await axios.post('https://localhost:8082/initiateIssuance', {
+      await axios.post('http://localhost:8082/initiateIssuance', {
         oidcURI: uri
       });
 
-      await axios.post('https://localhost:8082/tokenRequest', {
+      await axios.post('http://localhost:8082/tokenRequest', {
         pin: pin
       });
 
-      await axios.post('https://localhost:8082/credentialRequest');
+      let issuanceResponse = await axios.post('http://localhost:8082/credentialRequest');
 
       console.log('Titulacion emitted successfully');
+
+      let titulacion = issuanceResponse.data.credential;
+      localStorage.setItem('titulacionEmitida', JSON.stringify(titulacion));
+      console.log('Titulacion emitida almacenada en localStorage');
+      console.log(titulacion);
+      router.push('/emisionFinalizada');
+
     } catch (error) {
       console.error('Error emitting titulacion:', error);
     }
