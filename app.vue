@@ -4,8 +4,10 @@
   </head>
 
   <ul class="bg-blue-950 mb-2">
+      //i want to redirect to root page when clicking on the title
+
       <li class="text-6xl font-extrabold tracking-tight text-white text-pretty text-center mb-2"><a
-              href="">Emisor de Titulaciones Digitales</a></li>
+              href="/">Emisor de Titulaciones Digitales</a></li>
 
       <div class="flex flex-row justify-center items-center">
           <ULink to="/" active-class="text-primary inline mr-10 font-bold mb-2 hover:text-primary-100" inactive-class="text-primary inline mr-10 font-bold mb-2 hover:text-primary-100">
