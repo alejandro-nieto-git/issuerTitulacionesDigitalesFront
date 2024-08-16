@@ -4,8 +4,6 @@
   </head>
 
   <ul class="bg-blue-950 mb-2">
-      //i want to redirect to root page when clicking on the title
-
       <li class="text-6xl font-extrabold tracking-tight text-white text-pretty text-center mb-2"><a
               href="/">Emisor de Titulaciones Digitales</a></li>
 
