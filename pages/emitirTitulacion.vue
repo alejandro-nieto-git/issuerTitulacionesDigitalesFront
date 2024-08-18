@@ -14,6 +14,10 @@ const router = useRouter();
   const isDataReady = ref<boolean>(false);
 
   // Function to make the POST request and generate the QR code
+  /**
+   * Generates a QR code for titulacion issuance.
+   * @returns {Promise<void>} A promise that resolves when the QR code is generated
+   */
   const generateQRCode = async () => {
     try {
       const response = await axios.post('http://localhost:9000/credentialOfferTitulacionDigital', {
@@ -30,6 +34,12 @@ const router = useRouter();
     }
   };
 
+  /**
+   * Function to emit a titulacion.
+   * It initiates the issuance, requests a token, and the titulacion credential.
+   * If successful, it stores the emitted titulacion in the local storage and navigates to the '/emisionFinalizada' route.
+   * If an error occurs, it logs the error message to the console.
+   */
   const emitirTitulacion = async () => {
     try {
       await axios.post('http://localhost:8082/initiateIssuance', {

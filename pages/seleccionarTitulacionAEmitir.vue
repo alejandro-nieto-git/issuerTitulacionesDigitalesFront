@@ -34,6 +34,11 @@ const listaTitulacionesTerminadas = ref(
   ]
 )
 
+/**
+ * Stores the selected titulacion in the local storage.
+ * 
+ * @param {any} titulacion - The titulacion.
+ */
 function storeTitulacionAEmitir(titulacion: any) {
   localStorage.setItem('titulacionAEmitir', JSON.stringify(titulacion));
   console.log('Titulacion almacenada en localStorage');
