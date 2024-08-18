@@ -65,6 +65,7 @@ async function fetchIssuedTitulaciones() {
     }
   }
 ];
+}
 
 
 function toggleRevocation(titulacion) {
