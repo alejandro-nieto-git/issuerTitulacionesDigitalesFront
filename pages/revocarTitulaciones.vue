@@ -1,18 +1,18 @@
 <template>
   <div class="issued-titulaciones-manager">
     <h1>Administrar titulaciones emitidas</h1>
-    <nuxt-table :items="issuedTitulaciones" :fields="fields">
+    <nuxt-table :items="titulacionCredentials" :fields="fields">
       <template #cell(revocada)="props">
         <nuxt-switch 
-          v-model="props.item.credential.credentialSubject.hasTitulacion.display[0].revocada" 
-          @update:modelValue="toggleRevocation(props.item)" 
+          v-model="props.item.credential.credentialSubject.hasTitulacion.revocada" 
+          @update:modelValue="() => toggleRevocation(props.item)" 
         />
       </template>
       <template #cell(actions)="props">
         <nuxt-button 
-          @click="confirmRevoke(props.item)" 
+          @click="() => confirmRevoke(props.item)" 
           color="red" 
-          :disabled="!props.item.credential.credentialSubject.hasTitulacion.display[0].revocada"
+          :disabled="!props.item.credential.credentialSubject.hasTitulacion.revocada"
         >
           Revocar
         </nuxt-button>
@@ -24,24 +24,53 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 
-// State
-const issuedTitulaciones = ref([]);
+interface HasTitulacion {
+  codigoTitulacion: string;
+  nombreTitulacion: string;
+  tipo: string;
+  promocion: string;
+  notaMedia: string;
+  fechaHoraEmision: string;
+  revocada: boolean;
+  decretoLey: string;
+  descripcionRegistroFisico: string;
+}
 
-// Table fields
+interface CredentialSubject {
+  id: string;
+  nif: string;
+  nombre: string;
+  apellido1: string;
+  apellido2: string;
+  fechaNacimiento: string;
+  hasTitulacion: HasTitulacion;
+}
+
+interface Credential {
+  type: string[];
+  issuer: string;
+  issuanceDate: string;
+  credentialSubject: CredentialSubject;
+}
+
+interface TitulacionCredential {
+  credential: Credential;
+}
+
+const titulacionCredentials = ref<TitulacionCredential[]>([]);
+
 const fields = [
-  { key: 'nombre', label: 'Nombre' },
-  { key: 'apellido1', label: 'Primer Apellido' },
-  { key: 'apellido2', label: 'Segundo Apellido' },
-  { key: 'issuanceDate', label: 'Fecha de Emisión' },
-  { key: 'revocada', label: 'Revocada', sortable: true },
+  { key: 'credential.credentialSubject.nombre', label: 'Nombre' },
+  { key: 'credential.credentialSubject.apellido1', label: 'Primer Apellido' },
+  { key: 'credential.credentialSubject.apellido2', label: 'Segundo Apellido' },
+  { key: 'credential.issuanceDate', label: 'Fecha de Emisión' },
+  { key: 'credential.credentialSubject.hasTitulacion.revocada', label: 'Revocada', sortable: true },
   { key: 'actions', label: 'Acciones', sortable: false },
 ];
 
-async function fetchIssuedTitulaciones() {
+async function fetchTitulacionCredentials() {
   //TODO: get issued titulaciones from the database by calling an issuer endpoint
-
-  issuedTitulaciones.value = [
-    // Mock issued titulaciones data as Verifiable Credentials
+  const rawData = [
     {
       credential: {
         "@context": ["https://www.w3.org/2018/credentials/v1"],
@@ -72,30 +101,52 @@ async function fetchIssuedTitulaciones() {
       }
     }
   ];
-}
 
-function toggleRevocation(titulacion: any) {
-    if (titulacion.credential.credentialSubject.hasTitulacion.display[0].revocada === true) {
-        titulacion.credential.credentialSubject.hasTitulacion.display[0].revocada = false;
-    } else {
-        titulacion.credential.credentialSubject.hasTitulacion.display[0].revocada = true;
+  titulacionCredentials.value = rawData.map(item => ({
+    credential: {
+      type: item.credential.type,
+      issuer: item.credential.issuer,
+      issuanceDate: item.credential.issuanceDate,
+      credentialSubject: {
+        id: item.credential.credentialSubject.id,
+        nif: item.credential.credentialSubject.nif.display[0].nif,
+        nombre: item.credential.credentialSubject.nombre.display[0].nombre,
+        apellido1: item.credential.credentialSubject.apellido1.display[0].apellido1,
+        apellido2: item.credential.credentialSubject.apellido2.display[0].apellido2,
+        fechaNacimiento: item.credential.credentialSubject.fechaNacimiento.display[0].fechaNacimiento,
+        hasTitulacion: {
+          codigoTitulacion: item.credential.credentialSubject.hasTitulacion.display[0].codigoTitulacion,
+          nombreTitulacion: item.credential.credentialSubject.hasTitulacion.display[0].nombreTitulacion,
+          tipo: item.credential.credentialSubject.hasTitulacion.display[0].tipo,
+          promocion: item.credential.credentialSubject.hasTitulacion.display[0].promocion,
+          notaMedia: item.credential.credentialSubject.hasTitulacion.display[0].notaMedia,
+          fechaHoraEmision: item.credential.credentialSubject.hasTitulacion.display[0].fechaHoraEmision,
+          revocada: item.credential.credentialSubject.hasTitulacion.display[0].revocada,
+          decretoLey: item.credential.credentialSubject.hasTitulacion.display[0].decretoLey,
+          descripcionRegistroFisico: item.credential.credentialSubject.hasTitulacion.display[0].descripcionRegistroFisico,
+        }
+      }
     }
+  }));
 }
 
-
-async function saveIssuedTitulacion(titulacion: any) {
-  //TODO: save the updated titulacion to the database by calling an issuer endpoint
+function toggleRevocation(titulacion: TitulacionCredential) {
+  titulacion.credential.credentialSubject.hasTitulacion.revocada = !titulacion.credential.credentialSubject.hasTitulacion.revocada;
 }
 
-function confirmRevoke(titulacion: any) {
-  const nombre = titulacion.credential.credentialSubject.nombre.display[0].nombre;
-  const apellido1 = titulacion.credential.credentialSubject.apellido1.display[0].apellido1;
+async function saveTitulacionCredential(titulacion: TitulacionCredential) {
+  // TODO: Save the updated titulacion to the database by calling an issuer endpoint
+}
+
+function confirmRevoke(titulacion: TitulacionCredential) {
+  const nombre = titulacion.credential.credentialSubject.nombre;
+  const apellido1 = titulacion.credential.credentialSubject.apellido1;
   if (confirm(`¿Está seguro que desea revocar la titulación para ${nombre} ${apellido1}?`)) {
-    saveIssuedTitulacion(titulacion);
+    saveTitulacionCredential(titulacion);
   }
 }
 
-onMounted(fetchIssuedTitulaciones);
+onMounted(fetchTitulacionCredentials);
 </script>
 
 <style scoped>
