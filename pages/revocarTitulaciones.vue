@@ -1,23 +1,23 @@
 <template>
   <div class="issued-titulaciones-manager">
-    <h1>Administrar titulaciones emitidas</h1>
-    <nuxt-table :items="titulacionCredentials" :fields="fields">
-      <template #cell(revocada)="props">
-        <nuxt-switch 
-          v-model="props.item.credential.credentialSubject.hasTitulacion.revocada" 
-          @update:modelValue="() => toggleRevocation(props.item)" 
+    <UTable :rows="titulacionCredentials" :columns="fields">
+      <template #credential.credentialSubject.hasTitulacion.revocada-data="{ row }">
+        <UToggle
+          v-model="row.credential.credentialSubject.hasTitulacion.revocada" 
+          @update:modelValue="() => toggleRevocation(row)" 
         />
       </template>
-      <template #cell(actions)="props">
-        <nuxt-button 
-          @click="() => confirmRevoke(props.item)" 
+      <template #actions-data="row">
+        <UButton 
+          @click="() => confirmRevoke(row)" 
           color="red" 
-          :disabled="!props.item.credential.credentialSubject.hasTitulacion.revocada"
+          :disabled="!row.credential.credentialSubject.hasTitulacion.revocada"
+
         >
           Revocar
-        </nuxt-button>
+        </UButton>
       </template>
-    </nuxt-table>
+    </UTable>
   </div>
 </template>
 
@@ -128,17 +128,21 @@ async function fetchTitulacionCredentials() {
       }
     }
   }));
+  console.log("Fetch titulaciones", titulacionCredentials.value);
 }
 
 function toggleRevocation(titulacion: TitulacionCredential) {
   titulacion.credential.credentialSubject.hasTitulacion.revocada = !titulacion.credential.credentialSubject.hasTitulacion.revocada;
+  console.log("Revocada switched to", titulacion.credential.credentialSubject.hasTitulacion.revocada);
 }
 
 async function saveTitulacionCredential(titulacion: TitulacionCredential) {
   // TODO: Save the updated titulacion to the database by calling an issuer endpoint
+  console.log("Titulacion saved", titulacion);
 }
 
 function confirmRevoke(titulacion: TitulacionCredential) {
+  console.log("Touched confirm revoke", titulacion.row);
   const nombre = titulacion.credential.credentialSubject.nombre;
   const apellido1 = titulacion.credential.credentialSubject.apellido1;
   if (confirm(`¿Está seguro que desea revocar la titulación para ${nombre} ${apellido1}?`)) {
