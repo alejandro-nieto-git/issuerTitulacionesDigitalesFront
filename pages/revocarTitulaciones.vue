@@ -3,16 +3,15 @@
     <UTable :rows="titulacionCredentials" :columns="fields">
       <template #credential.credentialSubject.hasTitulacion.revocada-data="{ row }">
         <UToggle
-          v-model="row.credential.credentialSubject.hasTitulacion.revocada" 
+          :modelValue="row.credential.credentialSubject.hasTitulacion.revocada"
           @update:modelValue="() => toggleRevocation(row)" 
         />
       </template>
-      <template #actions-data="row">
+      <template #actions-data="{ row }">
         <UButton 
           @click="() => confirmRevoke(row)" 
           color="red" 
           :disabled="!row.credential.credentialSubject.hasTitulacion.revocada"
-
         >
           Revocar
         </UButton>
