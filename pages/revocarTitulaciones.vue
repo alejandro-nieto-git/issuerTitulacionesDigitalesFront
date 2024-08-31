@@ -1,17 +1,22 @@
 <template>
   <div class="issued-titulaciones-manager">
     <UTable :rows="titulacionCredentials" :columns="fields">
-      <template #credential.credentialSubject.hasTitulacion.revocada-data="{ row }">
-        <UToggle
-          :modelValue="row.credential.credentialSubject.hasTitulacion.revocada"
-          @update:modelValue="() => toggleRevocation(row)" 
-        />
+      <template #credentialSubject.hasTitulacion.revocada-data="{ row }">
+        <div v-if="row.credentialSubject.hasTitulacion.revocada">
+          <span>Revocada</span>
+        </div>
+        <div v-else>
+          <UToggle
+            :modelValue="row.credentialSubject.hasTitulacion.revoking"
+            @update:modelValue="() => toggleRevocation(row)" 
+          />
+        </div>
       </template>
       <template #actions-data="{ row }">
         <UButton 
           @click="() => confirmRevoke(row)" 
           color="red" 
-          :disabled="!row.credential.credentialSubject.hasTitulacion.revocada"
+          :disabled="!row.credentialSubject.hasTitulacion.revoking"
         >
           Revocar
         </UButton>
@@ -31,6 +36,7 @@ interface HasTitulacion {
   notaMedia: string;
   fechaHoraEmision: string;
   revocada: boolean;
+  revoking?: boolean;
   decretoLey: string;
   descripcionRegistroFisico: string;
 }
@@ -45,25 +51,21 @@ interface CredentialSubject {
   hasTitulacion: HasTitulacion;
 }
 
-interface Credential {
+interface TitulacionCredential {
   type: string[];
   issuer: string;
   issuanceDate: string;
   credentialSubject: CredentialSubject;
 }
 
-interface TitulacionCredential {
-  credential: Credential;
-}
-
 const titulacionCredentials = ref<TitulacionCredential[]>([]);
 
 const fields = [
-  { key: 'credential.credentialSubject.nombre', label: 'Nombre' },
-  { key: 'credential.credentialSubject.apellido1', label: 'Primer Apellido' },
-  { key: 'credential.credentialSubject.apellido2', label: 'Segundo Apellido' },
-  { key: 'credential.issuanceDate', label: 'Fecha de Emisión' },
-  { key: 'credential.credentialSubject.hasTitulacion.revocada', label: 'Revocada', sortable: true },
+  { key: 'credentialSubject.nombre', label: 'Nombre' },
+  { key: 'credentialSubject.apellido1', label: 'Primer Apellido' },
+  { key: 'credentialSubject.apellido2', label: 'Segundo Apellido' },
+  { key: 'issuanceDate', label: 'Fecha de Emisión' },
+  { key: 'credentialSubject.hasTitulacion.revocada', label: 'Revocada'},
   { key: 'actions', label: 'Acciones', sortable: false },
 ];
 
@@ -102,7 +104,6 @@ async function fetchTitulacionCredentials() {
   ];
 
   titulacionCredentials.value = rawData.map(item => ({
-    credential: {
       type: item.credential.type,
       issuer: item.credential.issuer,
       issuanceDate: item.credential.issuanceDate,
@@ -125,14 +126,13 @@ async function fetchTitulacionCredentials() {
           descripcionRegistroFisico: item.credential.credentialSubject.hasTitulacion.display[0].descripcionRegistroFisico,
         }
       }
-    }
   }));
   console.log("Fetch titulaciones", titulacionCredentials.value);
 }
 
 function toggleRevocation(titulacion: TitulacionCredential) {
-  titulacion.credential.credentialSubject.hasTitulacion.revocada = !titulacion.credential.credentialSubject.hasTitulacion.revocada;
-  console.log("Revocada switched to", titulacion.credential.credentialSubject.hasTitulacion.revocada);
+  titulacion.credentialSubject.hasTitulacion.revoking = !titulacion.credentialSubject.hasTitulacion.revoking;
+  console.log("Revoking switched to", titulacion.credentialSubject.hasTitulacion.revoking);
 }
 
 async function saveTitulacionCredential(titulacion: TitulacionCredential) {
@@ -141,10 +141,12 @@ async function saveTitulacionCredential(titulacion: TitulacionCredential) {
 }
 
 function confirmRevoke(titulacion: TitulacionCredential) {
-  console.log("Touched confirm revoke", titulacion.row);
-  const nombre = titulacion.credential.credentialSubject.nombre;
-  const apellido1 = titulacion.credential.credentialSubject.apellido1;
+  const nombre = titulacion.credentialSubject.nombre;
+  const apellido1 = titulacion.credentialSubject.apellido1;
   if (confirm(`¿Está seguro que desea revocar la titulación para ${nombre} ${apellido1}?`)) {
+    titulacion.credentialSubject.hasTitulacion.revocada = true;
+    console.log("Revoke confirmed", titulacion);
+    delete titulacion.credentialSubject.hasTitulacion.revoking;
     saveTitulacionCredential(titulacion);
   }
 }
