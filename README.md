@@ -73,3 +73,6 @@ bun run preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+
+# Setting up the git submodule
+git submodule add git@github.com:alejandro-nieto-git/titulacion-digital-model.git
