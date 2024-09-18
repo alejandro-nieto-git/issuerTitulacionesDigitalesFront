@@ -21,7 +21,7 @@ const router = useRouter();
    */
   const generateQRCode = async () => {
     try {
-      const response = await axios.post('http://localhost:9000/credentialOfferTitulacionDigital', {
+      const response = await axios.post(import.meta.env.VITE_ISSUER_URI + '/credentialOfferTitulacionDigital', {
         preAuthorizedCode: '1234',
         idTitulacionAEmitir: titulacionAEmitir.codigoTitulacion 
       });
@@ -43,15 +43,15 @@ const router = useRouter();
    */
   const emitirTitulacion = async () => {
     try {
-      await axios.post('http://localhost:8082/initiateIssuance', {
+      await axios.post(import.meta.env.VITE_WALLET_CLIENT_URI + '/initiateIssuance', {
         oidcURI: uri
       });
 
-      await axios.post('http://localhost:8082/tokenRequest', {
+      await axios.post(import.meta.env.VITE_WALLET_CLIENT_URI + '/tokenRequest', {
         pin: pin
       });
 
-      let issuanceResponse = await axios.post('http://localhost:8082/credentialRequest');
+      let issuanceResponse = await axios.post(import.meta.env.VITE_WALLET_CLIENT_URI + '/credentialRequest');
 
       console.log('Titulacion emitted successfully');
 
