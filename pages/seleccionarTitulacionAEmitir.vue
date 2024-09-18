@@ -1,38 +1,9 @@
 <script setup lang = ts>
 import { ref } from 'vue'
+import axios from 'axios';
 
 //TODO: Aqui se debe llamar al backend para que consulte al endpoint de la UVa para obtener las titulaciones finalizadas del estudiante
-const listaTitulacionesTerminadas = ref(
-  [
-    {
-      'nombreTitulacion': 'Ingenieria Industrial',
-      'tipo': 'Grado',
-      'codigoTitulacion': '81639',
-      'notaMedia': '6',
-      'fechaHora': '1709153385',
-      'decretoLey': 'a',
-      'descripcionRegistroFisico': 'b',
-    },
-    {
-      'nombreTitulacion': 'Filosofia',
-      'tipo': 'Grado',
-      'codigoTitulacion': '82639',
-      'notaMedia': '5.9',
-      'fechaHora': '1709153385',
-      'decretoLey': 'a',
-      'descripcionRegistroFisico': 'b',
-    },
-    {
-      'nombreTitulacion': 'Ingenieria Informatica',
-      'tipo': 'Grado',
-      'codigoTitulacion': '83639',
-      'notaMedia': '8.6',
-      'fechaHora': '1709153385',
-      'decretoLey': 'a',
-      'descripcionRegistroFisico': 'b',
-    },
-  ]
-)
+const listaTitulacionesTerminadas = ref((await axios.get(import.meta.env.VITE_ISSUER_URI + '/titulacionFisicaUVa')).data);
 
 /**
  * Stores the selected titulacion in the local storage.

@@ -7,6 +7,7 @@
 const router = useRouter();
 
   const titulacionAEmitir = JSON.parse(localStorage.getItem('titulacionAEmitir')!)
+  console.log('Titulacion retrieved from localStorage:', titulacionAEmitir);
 
   let qrCodeUrl = ref<string>('');
   let uri = '';
@@ -22,7 +23,7 @@ const router = useRouter();
     try {
       const response = await axios.post('http://localhost:9000/credentialOfferTitulacionDigital', {
         preAuthorizedCode: '1234',
-        idTitulacionAEmitir: '83639'
+        idTitulacionAEmitir: titulacionAEmitir.codigoTitulacion 
       });
 
       uri = response.data.uri;
