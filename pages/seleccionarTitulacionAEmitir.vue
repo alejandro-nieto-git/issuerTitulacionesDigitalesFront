@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import axios from 'axios';
 
 //TODO: Aqui se debe llamar al backend para que consulte al endpoint de la UVa para obtener las titulaciones finalizadas del estudiante
-const listaTitulacionesTerminadas = ref((await axios.get(import.meta.env.VITE_ISSUER_URI + '/titulacionFisicaUVa')).data);
+const listaTitulacionesTerminadas = ref((await axios.get(import.meta.env.VITE_ISSUER_URI + '/titulacionesFisicasUVa')).data);
 
 /**
  * Stores the selected titulacion in the local storage.

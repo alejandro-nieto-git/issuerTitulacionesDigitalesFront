@@ -46,7 +46,7 @@ const fields = [
 ];
 
 async function fetchTitulacionCredentials() {
-  titulacionCredentials.value = (await axios.get(import.meta.env.VITE_ISSUER_URI + "/titulacion")).data;
+  titulacionCredentials.value = (await axios.get(import.meta.env.VITE_ISSUER_URI + "/titulaciones")).data;
   preProcessedTitulacionCredentials.value = preprocessTitulacionCredentials(titulacionCredentials.value);
   console.log("Fetch titulaciones", titulacionCredentials.value);
 }
@@ -59,19 +59,29 @@ function toggleRevocation(titulacion: any) {
 async function saveTitulacionCredential(titulacion: TitulacionCredential) {
   let titulacionId = titulacion._id;
   delete titulacion._id;
-  await axios.put(import.meta.env.VITE_ISSUER_URI + "/titulacion/" + titulacionId, titulacion);
+  await axios.put(import.meta.env.VITE_ISSUER_URI + "/titulaciones/" + titulacionId, titulacion);
   console.log("Titulacion saved", titulacion);
 }
+
+
+async function revokeTitulacionCredential(titulacion: TitulacionCredential) {
+  let titulacionId = titulacion._id;
+  delete titulacion._id;
+  await axios.put(import.meta.env.VITE_ISSUER_URI + "/titulaciones/" + titulacionId, titulacion);
+  console.log("Titulacion saved", titulacion);
+}
+
 
 async function confirmRevoke(titulacion: any) {
   const nombre = titulacion.credentialSubject.nombre;
   const apellido1 = titulacion.credentialSubject.apellido1;
   if (confirm(`¿Está seguro que desea revocar la titulación para ${nombre} ${apellido1}?`)) {
-    let revokedTitulacion = (await axios.get(import.meta.env.VITE_ISSUER_URI + "/titulacion/" + titulacion._id)).data;
+    let revokedTitulacion = (await axios.get(import.meta.env.VITE_ISSUER_URI + "/titulaciones/" + titulacion._id)).data;
     console.log("Revoking", revokedTitulacion);
     revokedTitulacion.credentialSubject.hasTitulacion.display[0].revocada = true;
     console.log("Revoke confirmed", revokedTitulacion);
     saveTitulacionCredential(revokedTitulacion);
+    axios.delete(import.meta.env.VITE_ISSUER_URI + "/titulaciones/" + titulacion._id);
   }
 }
 
