@@ -40,9 +40,9 @@ const fields = [
   { key: 'credentialSubject.nombre', label: 'Nombre' },
   { key: 'credentialSubject.apellido1', label: 'Primer Apellido' },
   { key: 'credentialSubject.apellido2', label: 'Segundo Apellido' },
-  { key: 'issuanceDate', label: 'Fecha de Emisión' },
+  { key: 'issuanceDate', label: 'Fecha de Emisión', sortable: true },
   { key: 'credentialSubject.hasTitulacion.revocada', label: 'Revocada'},
-  { key: 'actions', label: 'Acciones', sortable: false },
+  { key: 'actions', label: 'Acciones'},
 ];
 
 async function fetchTitulacionCredentials() {
@@ -80,8 +80,8 @@ async function confirmRevoke(titulacion: any) {
     console.log("Revoking", revokedTitulacion);
     revokedTitulacion.credentialSubject.hasTitulacion.display[0].revocada = true;
     console.log("Revoke confirmed", revokedTitulacion);
+    await axios.delete(import.meta.env.VITE_ISSUER_URI + "/titulaciones/" + titulacion._id);
     saveTitulacionCredential(revokedTitulacion);
-    axios.delete(import.meta.env.VITE_ISSUER_URI + "/titulaciones/" + titulacion._id);
   }
 }
 
