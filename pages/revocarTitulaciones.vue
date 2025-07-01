@@ -79,6 +79,8 @@ async function confirmRevoke(titulacion: any) {
     let revokedTitulacion = (await axios.get(import.meta.env.VITE_ISSUER_URI + "/titulaciones/" + titulacion._id)).data;
     console.log("Revoking", revokedTitulacion);
     revokedTitulacion.credentialSubject.hasTitulacion.display[0].revocada = true;
+    titulacion.credentialSubject.hasTitulacion.revocada = true;
+    titulacion.credentialSubject.hasTitulacion.revoking = false;
     console.log("Revoke confirmed", revokedTitulacion);
     await axios.delete(import.meta.env.VITE_ISSUER_URI + "/titulaciones/" + titulacion._id);
     saveTitulacionCredential(revokedTitulacion);

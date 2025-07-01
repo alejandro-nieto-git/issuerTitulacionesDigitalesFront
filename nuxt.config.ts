@@ -3,6 +3,8 @@ export default defineNuxtConfig({
   colorMode: {
     preference: 'light'
   },
+  ssr: false,
+
 
   devtools: { enabled: true },
   modules: ['@nuxt/ui', 'nuxt-icon'],

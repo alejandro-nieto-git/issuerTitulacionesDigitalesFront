@@ -59,6 +59,17 @@ const router = useRouter();
       localStorage.setItem('titulacionEmitida', JSON.stringify(titulacion));
       console.log('Titulacion emitida almacenada en localStorage');
       console.log(titulacion);
+
+      let pkpassGenerationResponse = await axios.post(import.meta.env.VITE_ISSUER_URI + '/generate-pkpass', titulacion,
+      { responseType: 'blob'});
+      const blob = new Blob([pkpassGenerationResponse.data], { type: 'application/vnd.apple.pkpass' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'titulacion.pkpass';
+      link.click();
+      URL.revokeObjectURL(url);
+
       router.push('/emisionFinalizada');
 
     } catch (error) {
